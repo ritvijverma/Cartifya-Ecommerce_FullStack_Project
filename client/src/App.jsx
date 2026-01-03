@@ -8,12 +8,16 @@ import Policy from "./pages/Policy";
 import Register from "./Auth/Register";
 import Login from "./Auth/Login";
 import ForgotPassword from "./Auth/ForgotPassword";
-import Dashboard from "./components/user/Dashboard";
 import AdminRoute from "./components/Routes/AdminRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserRoute from "./components/Routes/UserRoute";
+import CreateCategory from "./pages/Admin/CreateCategory";
+import CreateProduct from "./pages/Admin/CreateProduct";
+import Customers from "./pages/Admin/Customers";
+import AdminHome from "./pages/Admin/AdminHome";
+import Dashboard from "./pages/user/Dashboard";
 
 const App = () => {
   return (
@@ -31,11 +35,17 @@ const App = () => {
             <Route path="user" element={<Dashboard />} />
           </Route>
 
-          {/* Admin Dashboard */}
-          <Route element={<AdminRoute />}>
-            <Route path="admin" element={<AdminDashboard />} />
-          </Route>
-        </Route>
+        {/* Admin */}
+  <Route element={<AdminRoute />}>
+    <Route path="admin" element={<AdminDashboard />}>
+      <Route index element={<AdminHome />} />
+      <Route path="admin-home" element={<AdminHome />} />
+      <Route path="create-category" element={<CreateCategory />} />
+      <Route path="create-product" element={<CreateProduct />} />
+      <Route path="customers" element={<Customers />} />
+    </Route>
+  </Route>
+</Route>
 
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

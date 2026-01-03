@@ -1,6 +1,5 @@
 import React from 'react'
-import Layout from '../Layouts/Layout'
-
+import Layout from '../../components/Layouts/Layout'
 const Dashboard = () => {
   return (
     <Layout title={"Dashboard- Crtifya App"}>

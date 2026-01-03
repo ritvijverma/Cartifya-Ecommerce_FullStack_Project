@@ -1,11 +1,11 @@
 import React from 'react'
+import AdminMenu from '../../components/Layouts/AdminMenu'
 
 const AdminDashboard = () => {
-  return (
-    <div>
-        <h1>AdminDashboard</h1>
-        </div>
-  )
+    
+  return <AdminMenu/>
+        
+  
 }
 
 export default AdminDashboard
