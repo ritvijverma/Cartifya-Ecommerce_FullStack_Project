@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoute.js";
-
+import categogryRoute from "./routes/categoryRoute.js"
 // config env
 dotenv.config();
 
@@ -27,6 +27,9 @@ const __dirname = path.dirname(__filename);
 
 // API routes
 app.use("/api/v1/auth", authRoutes);
+
+//Category routes
+app.use("/api/v1/category",categogryRoute)
 
 // React build serve
 app.use(express.static(path.join(__dirname, "client/dist")));
