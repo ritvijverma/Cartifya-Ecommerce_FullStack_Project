@@ -1,11 +1,23 @@
-import React from 'react'
-import Layout from '../../components/Layouts/Layout'
+import React from "react";
+import Layout from "../../components/Layouts/Layout";
+import UserMenu from "./UserMenu";
+import { Box } from "@mui/material";
+import { Outlet } from "react-router-dom";
+
 const Dashboard = () => {
   return (
-    <Layout title={"Dashboard- Crtifya App"}>
-        <h1>This is Dashboard Page</h1>
-    </Layout>
-  )
-}
+    <Layout>
+      <Box sx={{ display: "flex", gap: 0.1 }}>
+        <Box sx={{ width: 260, flexShrink: 0 }}>
+          <UserMenu />
+        </Box>
 
-export default Dashboard
+        <Box sx={{ flexGrow: 1 }}>
+          <Outlet />
+        </Box>
+      </Box>
+    </Layout>
+  );
+};
+
+export default Dashboard;

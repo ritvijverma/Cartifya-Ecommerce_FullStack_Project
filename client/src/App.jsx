@@ -18,6 +18,8 @@ import CreateProduct from "./pages/Admin/CreateProduct";
 import Customers from "./pages/Admin/Customers";
 import AdminHome from "./pages/Admin/AdminHome";
 import Dashboard from "./pages/user/Dashboard";
+import PrivateRoute from "./components/Routes/Private";
+import UserHome from "./pages/user/UserHome";
 
 const App = () => {
   return (
@@ -32,8 +34,18 @@ const App = () => {
         <Route path="/dashboard">
           {/* User Dashboard */}
           <Route element={<UserRoute />}>
-            <Route path="user" element={<Dashboard />} />
+            {/* <Route path="user" element={<Dashboard />} /> */}
+            <Route path="user" element={<Dashboard />}>
+              <Route index element={<UserHome />} />
+              <Route path="profile" element={<UserHome />} />
+            </Route>
+            
+
+
           </Route>
+
+
+
 
         {/* Admin */}
   <Route element={<AdminRoute />}>
