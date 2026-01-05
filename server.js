@@ -1,3 +1,7 @@
+//API Documentation
+import swaggerUi from "swagger-ui-express";
+import swaggerDoc from "swagger-jsdoc";
+
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
@@ -7,13 +11,31 @@ import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoute.js";
-import categogryRoute from "./routes/categoryRoute.js"
-import productRoute from "./routes/productRoute.js"
+import categogryRoute from "./routes/categoryRoute.js";
+import productRoute from "./routes/productRoute.js";
 // config env
 dotenv.config();
 
 // db connect
 connectDB();
+
+//swagger api config
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Cartifya E-commerce Full Stack Application",
+      description: "Node Express Full Stack Application",
+    },
+    servers: [
+      {
+        url: "http://localhost:8080",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
+const spec = swaggerDoc(options);
 
 const app = express();
 
@@ -30,18 +52,19 @@ const __dirname = path.dirname(__filename);
 app.use("/api/v1/auth", authRoutes);
 
 //Category routes
-app.use("/api/v1/category",categogryRoute)
+app.use("/api/v1/category", categogryRoute);
 
 //Product Route
-app.use("/api/v1/product",productRoute)
+app.use("/api/v1/product", productRoute);
 
+//swagger home route
+app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(spec));
 // React build serve
 app.use(express.static(path.join(__dirname, "client/dist")));
 
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "client/dist/index.html"));
 });
-
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
