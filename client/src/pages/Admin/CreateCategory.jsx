@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import CategoryForm from "../../components/Form/CategoryForm";
-import { Button, Modal } from 'antd';
+import {  Modal } from 'antd';
 
 
 const CreateCategory = () => {
@@ -122,7 +122,6 @@ const handleUpdate = async(e) => {
                   <td className="px-6 py-4 ">
                     <div className="flex  gap-3">
                       <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-                      // onClick={() => handleUpdate(c._id)}
                       onClick={() => {
                         setVisible(true); 
                         setUpdatedName(c.name);
