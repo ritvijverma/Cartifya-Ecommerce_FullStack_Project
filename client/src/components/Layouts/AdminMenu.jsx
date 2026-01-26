@@ -1,216 +1,165 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import MenuIcon from "@mui/icons-material/Menu";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { toast } from "react-toastify";
-
-
-// E-commerce icons
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import InventoryIcon from "@mui/icons-material/Inventory";
-import CategoryIcon from "@mui/icons-material/Category";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PeopleIcon from "@mui/icons-material/People";
-import PaymentIcon from "@mui/icons-material/Payment";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { useAuth } from "../../context/Auth";
-import Card from "@mui/material/Card";
+import React, { useState } from "react";
+import { Layout, Menu, Button } from "antd";
+import {
+  DashboardOutlined,
+  AppstoreOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+  CreditCardOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  
+} from "@ant-design/icons";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-const drawerWidth = 240;
+import { toast } from "react-toastify";
+import { useAuth } from "../../context/Auth";
 
-export default function AdminMenu() {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
-  const navigate = useNavigate()
-  const [auth, setAuth] = useAuth()
+const { Header, Sider, Content } = Layout;
 
-  const handleDrawerClose = () => {
-    setIsClosing(true);
-    setMobileOpen(false);
+const AdminMenu = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const [auth, setAuth] = useAuth();
+
+  const handleLogout = () => {
+    setAuth({ user: null, token: "" });
+    localStorage.removeItem("auth");
+    toast.success("Logout Successfully");
+    navigate("/login");
   };
-
-  const handleDrawerTransitionEnd = () => {
-    setIsClosing(false);
-  };
-
-  const handleDrawerToggle = () => {
-    if (!isClosing) {
-      setMobileOpen(!mobileOpen);
-    }
-  };
-
-  // 🔹 E-Commerce Menu Items
-  const menuItems = [
-    { text: "Dashboard", 
-      icon: <DashboardIcon />,
-path: "/dashboard/admin"
-
-    },
-    {
-      text: "Create Categories",
-      icon: <CategoryIcon />,
-      path: "/dashboard/admin/create-category",
-    },
-    {
-      text: "Create Products",
-      icon: <InventoryIcon />,
-      path: "/dashboard/admin/create-product",
-    },
-
-    { text: "Orders", icon: <ShoppingCartIcon /> },
-    { text: "Customers",
-      icon: <PeopleIcon />,
-      path:"/dashboard/admin/customers",
-    },
-    { text: "Payments", icon: <PaymentIcon /> },
-    { text: "Settings", icon: <SettingsIcon /> },
-  ];
-
-  const drawer = (
-    <Box>
-      <Toolbar>
-        <Typography variant="h6" fontWeight="bold">
-          E-Commerce Admin
-        </Typography>
-      </Toolbar>
-
-      <Divider />
-
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to={item.path}
-              sx={{
-                "&.active": {
-                  backgroundColor: "rgba(0,0,0,0.08)",
-                },
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem disablePadding
-         onClick={() => {
-                            setAuth({ user: null, token: "" });
-                            localStorage.removeItem("auth");
-                            toast.success("Logout Successfully");
-                            navigate("/login")
-                          }}
-        >
-          <ListItemButton>
-            <ListItemIcon>
-              <LogoutIcon color="error" />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </Box>
-  );
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-
-      {/* 🔝 AppBar */}
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
+    <Layout style={{ minHeight: "100vh" }}>
+      {/* SIDEBAR */}
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        trigger={null}
+        width={240}
+        style={{
+          background: "#001528",
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+        <div
+          style={{
+            height: 64,
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Admin Panel
+        </div>
+
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={["/dashboard/admin"]}
+        >
+          <Menu.Item key="/dashboard/admin" icon={<DashboardOutlined />}>
+            <NavLink to="/dashboard/admin">Dashboard</NavLink>
+          </Menu.Item>
+
+          <Menu.Item
+            key="/dashboard/admin/create-category"
+            icon={<AppstoreOutlined />}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap>
-            E-Commerce Admin Panel
-          </Typography>
-        </Toolbar>
-      </AppBar>
+            <NavLink to="/dashboard/admin/create-category">
+              Categories
+            </NavLink>
+          </Menu.Item>
 
-      {/* 📂 Sidebar */}
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      >
-        {/* Mobile Drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerClose}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-          slotProps={{
-            root: {
-              keepMounted: true,
-            },
+          <Menu.Item
+            key="/dashboard/admin/create-product"
+            icon={<ShoppingOutlined />}
+          >
+            <NavLink to="/dashboard/admin/create-product">
+             Create Products
+            </NavLink>
+          </Menu.Item>
+
+          <Menu.Item
+            key="/dashboard/admin/product"
+            icon={<ShoppingOutlined />}
+          >
+            <NavLink to="/dashboard/admin/product">
+             Products
+            </NavLink>
+          </Menu.Item>
+
+          <Menu.Item
+            key="/dashboard/admin/customers"
+            icon={<UserOutlined />}
+          >
+            <NavLink to="/dashboard/admin/customers">
+              Customers
+            </NavLink>
+          </Menu.Item>
+
+          <Menu.Item icon={<CreditCardOutlined />}>
+            Payments
+          </Menu.Item>
+
+          <Menu.Item icon={<SettingOutlined />}>
+            Settings
+          </Menu.Item>
+
+          <Menu.Divider />
+
+          <Menu.Item
+            danger
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+          >
+            Logout
+          </Menu.Item>
+        </Menu>
+      </Sider>
+
+      {/* MAIN LAYOUT */}
+      <Layout>
+        {/* HEADER */}
+        <Header
+          style={{
+            background: "#fff",
+            padding: "0 16px",
+            display: "flex",
+            alignItems: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
-          {drawer}
-        </Drawer>
+          <Button
+            type="text"
+            icon={
+              collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+            }
+            onClick={() => setCollapsed(!collapsed)}
+            style={{ fontSize: 18 }}
+          />
 
-        {/* Desktop Drawer */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
+          <h3 style={{ marginLeft: 16 }}>E-Commerce Admin</h3>
+        </Header>
+
+        {/* CONTENT */}
+        <Content
+          style={{
+            margin: "16px",
+            padding: 24,
+            background: "#fff",
+            borderRadius: 10,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
           }}
-          open
         >
-          {drawer}
-        </Drawer>
-      </Box>
-
-     {/* 🧾 Main Content */}
-<Box
-  component="main"
-  sx={{
-    flexGrow: 1,
-    p: 3,
-    width: { sm: `calc(100% - ${drawerWidth}px)` },
-  }}
->
-  <Toolbar />
-  <Outlet />
-</Box>
-    </Box>
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
   );
-}
+};
+
+export default AdminMenu;

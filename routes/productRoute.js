@@ -14,7 +14,8 @@ router.get('/get-product', requireSignIn, isAdmin, getProductController )
 router.get('/getsingle-product/:slug', requireSignIn, isAdmin, getSingleProductController )
 
 //get photo 
-router.get('/getproduct-photo/:pid', requireSignIn, isAdmin, getProductPhotoController)
+// product photos are public so the browser <img> tag can load them without auth headers
+router.get('/product-photo/:pid', getProductPhotoController)
 
 //delete route 
 router.delete('/delete-product/:pid', requireSignIn, isAdmin, deleteProductController)

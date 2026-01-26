@@ -2,28 +2,50 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Select, Button, Input } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import {useNavigate } from "react-router-dom"
+import { MinusOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import {useNavigate , useParams} from "react-router-dom"
+import {Modal} from "antd"
 
 const { Option } = Select;
+const UpdateProduct = () => {
+      const [categories, setCategories] = useState([]);
+      const [category, setCategory] = useState("");
+      const [photo, setPhoto] = useState(null);
+      const [preview, setPreview] = useState(null);
+    
+      const [name, setName] = useState("");
+      const [description, setDescription] = useState("");
+      const [price, setPrice] = useState("");
+      const [quantity, setQuantity] = useState("");
+      const [shipping, setShipping] = useState(false);
+      const [product,setProductId] = useState("")
+    
+      const fileInputRef = useRef(null);
+      const navigate = useNavigate()
+      const params = useParams();
 
-const CreateProduct = () => {
-  const [categories, setCategories] = useState([]);
-  const [category, setCategory] = useState("");
-  const [photo, setPhoto] = useState(null);
-  const [preview, setPreview] = useState(null);
+//get single product
+const getSingleProduct = async () =>{
+    try{
+        const {data} = await axios.get(`/api/v1/product/getsingle-product/${params.slug}`)
+        setProductId(data.product._id)
+        setName(data.product.name)
+      setDescription(data.product.description);
+      setPrice(data.product.price);
+      setQuantity(data.product.quantity);
+      setCategory(data.product.category._id);
+      setShipping(data.product.shipping);
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [shipping, setShipping] = useState("");
+    }
+    catch(error){
+        console.log(error);
+              toast.error("Failed to load product");
 
-  const fileInputRef = useRef(null);
-  const navigate = useNavigate()
+    }
+}
 
-  // ================= GET CATEGORIES =================
-  const getAllCategory = async () => {
+
+    const getAllCategory = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
@@ -38,7 +60,9 @@ const CreateProduct = () => {
   };
 
   useEffect(() => {
+    getSingleProduct(),
     getAllCategory();
+// eslint-disable-next-line
   }, []);
 
   // ================= IMAGE PREVIEW =================
@@ -51,9 +75,9 @@ const CreateProduct = () => {
     return () => URL.revokeObjectURL(objectUrl);
   }, [photo]);
 
-  const handleCreateProduct = async (e) => {
+  const handleUpdateProduct = async (e) => {
     e.preventDefault();
-    if (!name || !description || !price || !quantity || !category || !photo) {
+    if (!name || !description || !price || !quantity || !category ) {
   toast.error("Please fill all required fields");
   return;
 }
@@ -66,11 +90,11 @@ const CreateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("category", category);
       productData.append("shipping", shipping);
-      productData.append("photo", photo);
-      const { data } = await axios.post("/api/v1/product/create-product", productData);
+      photo && productData.append("photo", photo);
+      const { data } = await axios.put(`/api/v1/product/update-product/${product}`, productData);
 
       if (data?.success){
-        toast.success('Product Created Successfully')
+        toast.success('Product Updated Successfully')
         navigate('/dashboard/admin/product')
       }else{
         toast.error(data?.message)
@@ -81,9 +105,42 @@ const CreateProduct = () => {
     }
   };
 
+///delete function
+//   const handleDeleteProduct = async () =>{
+//     try{
+//         let answer = window.prompt('Are you sure want to delete product?')
+//         if(!answer) return
+//         const {data} = await axios.delete(`/api/v1/product/delete-product/${product}`)
+//         toast.success("Item Deleted Succesfully")
+//         navigate('/dashboard/admin/product')
+//     }catch(error){
+//         console.log(error);
+//         toast.error("Error While Deleting Product")
+//     }
+
+//   }
+const handleDeleteProduct = async() =>{
+    Modal.confirm({
+title: "Delete Product",
+content: "Are you sure want to delete this product?",
+okText:"Yes, Delete",
+okType:"danger",
+cancelText:"Cancel",
+async onOk(){
+    try{
+        const {data} = await axios.delete(`/api/v1/product/delete-product/${product}`)
+       toast.success("Item Deleted Succesfully")
+ navigate('/dashboard/admin/product')
+    }catch(error){
+        console.log(error);
+        toast.error("Error While Deleting")
+    }
+}   
+})
+}
   return (
-    <div style={{ maxWidth: "420px" }}>
-      <h2>Create Product</h2>
+  <div style={{ maxWidth: "420px" }}>
+      <h2>Update Product</h2>
 
       {/* CATEGORY */}
       <Select
@@ -91,6 +148,7 @@ const CreateProduct = () => {
         size="large"
         style={{ width: "100%", marginBottom: 16 }}
         onChange={setCategory}
+        value={category}
       >
         {categories.map((c) => (
           <Option key={c._id} value={c._id}>
@@ -142,7 +200,8 @@ const CreateProduct = () => {
         placeholder="Shipping Available?"
         size="large"
         style={{ width: "100%", marginBottom: 16 }}
-        onChange={setShipping}
+        onChange={(value) => setShipping(value === "1")}
+        value={shipping ? "1" : "0"}
       >
         <Option value="0">No</Option>
         <Option value="1">Yes</Option>
@@ -166,7 +225,7 @@ const CreateProduct = () => {
       />
 
       {/* IMAGE PREVIEW */}
-      {preview && (
+      {preview ? (
         <img
           src={preview}
           alt="preview"
@@ -175,19 +234,39 @@ const CreateProduct = () => {
             borderRadius: 8,
             border: "1px solid #ddd",
             objectFit: "cover",
+            marginBottom: 16,
           }}
         />
-      )}
+      ) : product ? (
+          <img
+            src={`/api/v1/product/product-photo/${product}`}
+          alt="preview"
+          height="150"
+          style={{
+            borderRadius: 8,
+            border: "1px solid #ddd",
+            objectFit: "cover",
+            marginBottom: 16,
+          }}
+        />
+      ) : null}
       <Button
       type="primary"
         icon={<PlusOutlined />}
-      onClick={handleCreateProduct}
+      onClick={handleUpdateProduct}
 
       >
-        Create Product
+        Update Product
       </Button>
-    </div>
-  );
-};
+         <Button
+      type="secondary"
+        icon={<MinusOutlined />}
+      onClick={handleDeleteProduct}
 
-export default CreateProduct;
+      >
+        Delete Product
+      </Button>
+    </div>  )
+}
+
+export default UpdateProduct
